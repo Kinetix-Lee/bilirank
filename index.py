@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import urllib3, json
 http = urllib3.PoolManager()
 
