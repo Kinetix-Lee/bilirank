@@ -3,5 +3,6 @@
 def devVariables():
   return {
     'printConfig': True,
-    'printResponse': True,
+    'printResponse': False,
+    'ignoreAntiFlood': False,
   }

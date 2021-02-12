@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import urllib3, sys, toml, json
+from time import sleep
 from development import devVariables
 http = urllib3.PoolManager()
 
@@ -29,8 +30,15 @@ try:
   f_bilirank_toml = open(paths['config'], 'r')
   config = toml.load(f_bilirank_toml)
   
+  uploaderCount = len(config['bilirank']['listUploader'])
   print('配置文件载入成功')
-  print('待查询的 up 主数量:', len(config['bilirank']['listUploader']))
+  print('待查询的 up 主数量:', uploaderCount)
+  
+  if dev['ignoreAntiFlood']:
+    print('Anti-Flood 机制被忽略，若人数 >= 200 建议重新开启')
+  else:
+    print('人数多，每次访问将会增加一定延迟') if uploaderCount > 200 else True;
+  
   debugPrint(config)
   
   # 逐个进行请求
@@ -45,6 +53,11 @@ try:
     follower = response['data']['card']['fans']
     print('用户数据已载入: {name} ({id})，粉丝数量 {fans}'.format(name=name, id=id, fans=follower))
     debugPrint(response)
+    
+    # anti flood
+    if uploaderCount >= 180:
+      sleep(75)
+    
 # 错误处理
 except OSError as err: 
   print('配置文件读取错误\n{0}'.format(err))
