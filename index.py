@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# -*- coding: UTF-8 -*-
+
 import urllib3, sys, toml
 http = urllib3.PoolManager()
 
