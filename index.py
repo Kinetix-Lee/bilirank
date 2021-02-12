@@ -16,6 +16,7 @@ paths = {
 }
 dev = devVariables()
 
+listId = []
 listName = []
 listFollower = []
 dataMap = []
@@ -57,6 +58,7 @@ try:
     name = response['data']['card']['name']
     follower = response['data']['card']['fans']
     
+    listId.append(id)
     listName.append(name)
     listFollower.append(follower)
     
@@ -77,7 +79,7 @@ except:
 finally:
   f_bilirank_toml.close() # 关闭文件
   for index in range(len(listName)): # 换成 listFollower 理论上也行得通
-    dataMap.append([listName[index], listFollower[index]])
+    dataMap.append([listId[index], listName[index], listFollower[index]])
   print('查询完毕')
   printDebug(dataMap, dev['printDataMap'])
 
