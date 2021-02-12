@@ -16,9 +16,13 @@ paths = {
 }
 dev = devVariables()
 
+listName = []
+listFollower = []
+dataMap = []
+
 # 调试打印程序
-def debugPrint(content):
-  print('[DEBUG]', content) if dev['printResponse'] else True;
+def printDebug(content, condition=True):
+  print('[DEBUG]', content) if condition else True;
 
 print('\nBiliRank - 哔哩哔哩数据自动化程序')
 print('https://github.com/Kinetix-Lee/bilirank\n')
@@ -39,7 +43,7 @@ try:
   else:
     print('人数多，每次访问将会增加一定延迟') if uploaderCount > 200 else True;
   
-  debugPrint(config)
+  printDebug(config, dev['printConfig'])
   
   # 逐个进行请求
   for id in config['bilirank']['listUploader']:
@@ -49,10 +53,15 @@ try:
                     'photo': False
                   })
     response = json.loads(request.data.decode('utf-8'))
+    
     name = response['data']['card']['name']
     follower = response['data']['card']['fans']
+    
+    listName.append(name)
+    listFollower.append(follower)
+    
     print('用户数据已载入: {name} ({id})，粉丝数量 {fans}'.format(name=name, id=id, fans=follower))
-    debugPrint(response)
+    printDebug(response, dev['printResponse'])
     
     # anti flood
     if uploaderCount >= 180:
@@ -67,6 +76,10 @@ except:
   print('未知错误', sys.exc_info()[0])
 finally:
   f_bilirank_toml.close() # 关闭文件
+  for index in range(len(listName)): # 换成 listFollower 理论上也行得通
+    dataMap.append([listName[index], listFollower[index]])
+  print('查询完毕')
+  printDebug(dataMap, dev['printDataMap'])
 
 # req_stat = http.request('GET', api['stat'], 
 #                   fields={

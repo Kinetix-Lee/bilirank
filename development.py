@@ -5,4 +5,5 @@ def devVariables():
     'printConfig': True,
     'printResponse': False,
     'ignoreAntiFlood': False,
+    'printDataMap': True
   }
