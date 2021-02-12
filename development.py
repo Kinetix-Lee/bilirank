@@ -2,5 +2,6 @@
 
 def devVariables():
   return {
-    'printConfig': False
+    'printConfig': True,
+    'printResponse': True,
   }
