@@ -9,6 +9,7 @@ dev = development.devVariables()
 
 paths = {
   'config': 'config/bilirank.toml',
+  'output': 'config/result.bilirank.json',
   'api': {
     'card': 'https://api.bilibili.com/x/web-interface/card'
     # 'stat': 'https://api.bilibili.com/x/relation/stat',
@@ -94,7 +95,7 @@ finally:
   
   print('导出文件')
   try:
-    f_result_bilirank_json = open('config/result.bilirank.json', 'w+')
+    f_result_bilirank_json = open(paths['output'], 'w+')
     f_result_bilirank_json.write(result)
   except OSError as err:
     print('导出失败', err)
