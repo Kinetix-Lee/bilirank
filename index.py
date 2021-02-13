@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-import urllib3, sys, toml, json, development
+import urllib3, sys, toml, json, development, datetime
 from time import sleep
+from datetime import datetime
 http = urllib3.PoolManager()
 dev = development.devVariables()
 
@@ -70,7 +71,7 @@ try:
     
 # 错误处理
 except OSError as err: 
-  print('配置文件读取错误\n{0}'.format(err))
+  print('配置文件读取错误', err)
 except KeyboardInterrupt as err:
   print('程序退出')
 except:
@@ -79,9 +80,28 @@ finally:
   f_bilirank_toml.close() # 关闭文件
   for index in range(len(listName)): # 换成 listFollower 理论上也行得通
     dataMap.append([listId[index], listName[index], listFollower[index]])
+  
   print('查询完毕')
   dataMap.sort(key=lambda el: el[0])
   printDebug(dataMap, dev['printDataMap'])
+  
+  print('生成输出信息')
+  result = json.dumps({
+    'date': datetime.now().timestamp(),
+    'listUploader': dataMap
+  })
+  printDebug(result, dev['printResult'])
+  
+  print('导出文件')
+  try:
+    f_result_bilirank_json = open('config/result.bilirank.json', 'w+')
+    f_result_bilirank_json.write(result)
+  except OSError as err:
+    print('导出失败', err)
+  finally:
+    f_result_bilirank_json.close()
+  
+  print('完成')
 
 # req_stat = http.request('GET', api['stat'], 
 #                   fields={
