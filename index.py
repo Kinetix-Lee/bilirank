@@ -87,7 +87,7 @@ finally:
   
   print('生成输出信息')
   result = json.dumps({
-    'date': datetime.now().timestamp(),
+    'timestamp': datetime.now().timestamp(),
     'listUploader': dataMap
   })
   printDebug(result, dev['printResult'])
