@@ -114,6 +114,9 @@ finally:
   print('生成输出信息')
   result = json.dumps({
     'timestamp': datetime.now().timestamp(),
+    'lastTimestamp': config['result_input']['timestamp'] 
+      if ('readOutput' in config and config['readOutput'] == True)
+      else 0,
     'listUploader': dataMap
   })
   printDebug(result, dev['printResult'])
