@@ -34,6 +34,7 @@ print('正在载入配置文件')
 # 打开并解析
 f_bilirank_toml = open(paths['config'], 'r')
 config = toml.load(f_bilirank_toml)['bilirank']
+f_bilirank_toml.close() # 关闭文件
 
 # 若配置文件要求使用上一次的结果，则载入
 if ('readOutput' in config and config['readOutput']):
@@ -68,10 +69,10 @@ printDebug(config, dev['printConfig'])
 # 逐个进行请求
 for id in config['listUploader']:
   request = http.request('GET', paths['api']['card'],
-                fields={
-                  'mid': str(id),
-                  'photo': False
-                })
+                          fields={
+                            'mid': str(id),
+                            'photo': False
+                          })
   response = json.loads(request.data.decode('utf-8'))
   
   name = response['data']['card']['name']
@@ -88,7 +89,6 @@ for id in config['listUploader']:
   if uploaderCount >= 180:
     sleep(75)
 
-f_bilirank_toml.close() # 关闭文件
 for index in range(len(listName)): # 换成 listFollower 理论上也行得通
   dataMap.append([listId[index], listName[index], listFollower[index]])
 
@@ -97,6 +97,7 @@ dataMap.sort(key=lambda el: el[0])
 printDebug(dataMap, dev['printDataMap'])
 
 print('生成输出信息')
+# TODO: 数据变化追踪
 result = json.dumps({
   'timestamp': datetime.now().timestamp(),
   'lastTimestamp': config['result_input']['timestamp'] 
@@ -112,9 +113,3 @@ f_result_bilirank_json.write(result)
 f_result_bilirank_json.close()
 
 print('完成')
-
-# req_stat = http.request('GET', api['stat'], 
-#                   fields={
-#                     'vmid': ''
-#                   })
-# print(json.loads(req_stat.data.decode('utf-8')))
