@@ -80,6 +80,7 @@ finally:
   for index in range(len(listName)): # 换成 listFollower 理论上也行得通
     dataMap.append([listId[index], listName[index], listFollower[index]])
   print('查询完毕')
+  dataMap.sort(key=lambda el: el[0])
   printDebug(dataMap, dev['printDataMap'])
 
 # req_stat = http.request('GET', api['stat'], 
