@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-import urllib3, sys, toml, json
+import urllib3, sys, toml, json, development
 from time import sleep
-from development import devVariables
 http = urllib3.PoolManager()
+dev = development.devVariables()
 
 paths = {
   'config': 'config/bilirank.toml',
@@ -14,7 +14,6 @@ paths = {
     # 'upstat': 'https://api.bilibili.com/x/space/upstat'
   }
 }
-dev = devVariables()
 
 listId = []
 listName = []
