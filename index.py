@@ -37,7 +37,7 @@ try:
   config = toml.load(f_bilirank_toml)['bilirank']
   
   # 若配置文件要求使用上一次的结果，则载入
-  if ('readOutput' in config and config['readOutput'] == True):
+  if ('readOutput' in config and config['readOutput']):
     # 若配置文件要求使用特定路径的结果，则载入
     if ('output' in config and type(config['output']) == str):
       paths['output'] = config['output']
@@ -115,7 +115,7 @@ finally:
   result = json.dumps({
     'timestamp': datetime.now().timestamp(),
     'lastTimestamp': config['result_input']['timestamp'] 
-      if ('readOutput' in config and config['readOutput'] == True)
+      if ('readOutput' in config and config['readOutput'])
       else 0,
     'listUploader': dataMap
   })
