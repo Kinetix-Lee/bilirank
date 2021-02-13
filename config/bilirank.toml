@@ -1,4 +1,6 @@
 [bilirank]
+readOutput = true
+output = 'config/result.bilirank.json'
 listUploader = [
   182888860 # Kinetix
 ]

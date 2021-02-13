@@ -34,9 +34,34 @@ print('正在载入配置文件')
 try:
   # 打开并解析
   f_bilirank_toml = open(paths['config'], 'r')
-  config = toml.load(f_bilirank_toml)
+  config = toml.load(f_bilirank_toml)['bilirank']
   
-  uploaderCount = len(config['bilirank']['listUploader'])
+  # 若配置文件要求使用上一次的结果，则载入
+  if ('readOutput' in config and config['readOutput'] == True):
+    # 若配置文件要求使用特定路径的结果，则载入
+    if ('output' in config and type(config['output']) == str):
+      paths['output'] = config['output']
+    config['listUploader'] = []
+    print('使用上一次的结果 ({0}) 作为配置文件'.format(paths['output']))
+    print('请注意，原配置文件 (bilirank.toml) 中 listUploader 字段将会被忽略')
+    
+    print('正在载入配置文件')
+    try:
+      f_result_bilirank_json_input = open(paths['output'], 'r')
+      result_input = json.load(f_result_bilirank_json_input)
+      config['result_input'] = result_input
+      print('配置文件载入成功')
+    except OSError as err: 
+      print('配置文件读取错误', err)
+    finally:
+      f_result_bilirank_json_input.close()
+      
+    for uploader in config['result_input']['listUploader']:
+      config['listUploader'].append(uploader[0])
+      
+    printDebug(result_input, dev['printConfig'])
+    
+  uploaderCount = len(config['listUploader'])
   print('配置文件载入成功')
   print('待查询的 up 主数量:', uploaderCount)
   
@@ -48,7 +73,7 @@ try:
   printDebug(config, dev['printConfig'])
   
   # 逐个进行请求
-  for id in config['bilirank']['listUploader']:
+  for id in config['listUploader']:
     request = http.request('GET', paths['api']['card'],
                   fields={
                     'mid': str(id),
