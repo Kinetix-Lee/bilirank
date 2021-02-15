@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-import urllib3, sys, toml, json, development, datetime
+import urllib3, toml, json, development, datetime
 from time import sleep
 from datetime import datetime
 http = urllib3.PoolManager()
