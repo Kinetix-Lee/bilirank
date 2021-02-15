@@ -2,5 +2,6 @@
 readOutput = true
 output = 'config/result.bilirank.json'
 listUploader = [
-  182888860 # Kinetix
+  182888860,  # Kinetix
+  131579371   # LF112
 ]

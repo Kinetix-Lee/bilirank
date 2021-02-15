@@ -2,10 +2,10 @@
 
 def devVariables():
   return {
-    'printConfig': True,
+    'printConfig': False,
     'printResponse': False,
     'ignoreAntiFlood': False,
-    'printDataMap': True,
-    'printResult': True,
-    'jsonPrettify': True,
+    'printDataMap': False,
+    'printResult': False,
+    'jsonPrettify': False,
   }
