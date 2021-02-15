@@ -10,10 +10,11 @@ dev = development.devVariables()
 PATH_CONFIG = 'config/bilirank.toml'
 API_CARD = 'https://api.bilibili.com/x/web-interface/card'
 
-listId = []
+listUploader = []
 listName = []
 listFollower = []
-dataMap = []
+dataMap = {}
+differenceFollower = {}
 
 # 调试打印程序
 def printDebug(content, condition=True):
@@ -35,20 +36,23 @@ PATH_OUTPUT = config['output'] \
   else 'config/result.bilirank.json' # 若配置文件要求使用特定路径的结果，则载入
 
 if READ_LAST_OUTPUT:
-  config['listUploader'] = []
   print('使用上一次的结果 ({0}) 作为配置文件'.format(PATH_OUTPUT))
   print('请注意，原配置文件 (bilirank.toml) 中 listUploader 字段将会被忽略')
   
   print('正在载入配置文件')
-  f_result_bilirank_json_input = open(PATH_OUTPUT, 'r')
-  result_input = json.load(f_result_bilirank_json_input)
-  f_result_bilirank_json_input.close()
-    
-  for uploader in result_input['listUploader']:
-    config['listUploader'].append(uploader[0])
-    
-  printDebug(result_input, dev['printConfig'])
-  
+  try:
+    f_result_bilirank_json_input = open(PATH_OUTPUT, 'r')
+    result_input = json.load(f_result_bilirank_json_input)
+    f_result_bilirank_json_input.close()
+    listUploader = list(result_input['listUploader'].keys())
+    printDebug(result_input, dev['printConfig'])
+  except: 
+    print('配置文件非法，正在使用普通模式')
+    READ_LAST_OUTPUT = False # Editing a 'constant' is kinda violation. Awaiting correction.
+    listUploader = config['listUploader']
+else:
+  listUploader = config['listUploader']
+
 uploaderCount = len(config['listUploader'])
 print('待查询的 up 主数量:', uploaderCount)
 
@@ -60,7 +64,7 @@ else:
 printDebug(config, dev['printConfig'])
 
 # 逐个进行请求
-for id in config['listUploader']:
+for id in listUploader:
   request = http.request('GET', API_CARD,
                           fields={
                             'mid': str(id),
@@ -71,7 +75,6 @@ for id in config['listUploader']:
   name = response['data']['card']['name']
   follower = response['data']['card']['fans']
   
-  listId.append(id)
   listName.append(name)
   listFollower.append(follower)
   
@@ -82,27 +85,41 @@ for id in config['listUploader']:
   if uploaderCount >= 180:
     sleep(75)
 
-for index in range(len(listName)): # 换成 listFollower 理论上也行得通
-  dataMap.append([listId[index], listName[index], listFollower[index]])
+# 生成 dataMap 和 differenceFollower
+for index in range(len(listUploader)):
+  dataMap[listUploader[index]] = [listName[index], listFollower[index]]
+  differenceFollower[listUploader[index]] =\
+    listFollower[index] - result_input['listUploader'][listUploader[index]][1]\
+    if READ_LAST_OUTPUT\
+    else {}
 
 print('查询完毕')
-dataMap.sort(key=lambda el: el[0])
 printDebug(dataMap, dev['printDataMap'])
 
 print('生成输出信息')
-# TODO: 数据变化追踪
-result = json.dumps({
-  'timestamp': datetime.now().timestamp(),
-  'lastTimestamp': result_input['timestamp'] 
-    if (READ_LAST_OUTPUT)
-    else 0,
-  'listUploader': dataMap
-})
-printDebug(result, dev['printResult'])
+now = datetime.now().timestamp()
+result = {
+  'timestamp': now,
+  'listUploader': dataMap,
+  'lastData': {}, # available if READ_LAST_OUTPUT
+  'differences': {} # available if READ_LAST_OUTPUT
+}
+if READ_LAST_OUTPUT:
+  # 禁止套娃
+  del result_input['lastData']
+  # del result_input['differences']
+  
+  result['lastData'] = result_input
+  result['differences'] = {
+    'timestamp': int(now - result_input['timestamp']),
+    'follower': differenceFollower
+  }
+  
+printDebug(json.dumps(result, indent = 2 if dev['jsonPrettify'] else None), dev['printResult'])
 
 print('导出文件')
 f_result_bilirank_json = open(PATH_OUTPUT, 'w+')
-f_result_bilirank_json.write(result)
+json.dump(result, f_result_bilirank_json)
 f_result_bilirank_json.close()
 
 print('完成')

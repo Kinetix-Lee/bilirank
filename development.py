@@ -7,4 +7,5 @@ def devVariables():
     'ignoreAntiFlood': False,
     'printDataMap': True,
     'printResult': True,
+    'jsonPrettify': True,
   }
